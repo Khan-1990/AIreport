@@ -1,14 +1,21 @@
-# Use an official NVIDIA CUDA base image which includes GPU drivers and PyTorch
-FROM pytorch/pytorch:2.3.0-cuda12.1-cudnn8-runtime
+# Use a stable official NVIDIA CUDA base image with PyTorch
+FROM pytorch/pytorch:2.2.2-cuda12.1-cudnn8-runtime
+
+# Set environment variables to ensure non-interactive setup
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the requirements file into the container
+# Copy the requirements file first to leverage Docker layer caching
 COPY requirements.txt .
 
-# Install Python libraries, huggingface_hub for downloading, and git-lfs
-RUN apt-get update && apt-get install -y git git-lfs && \
+# Update package lists, install git-lfs, then install Python packages
+# This also cleans up apt cache to reduce image size.
+RUN apt-get update && \
+    apt-get install -y git git-lfs && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
     pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt && \
     git lfs install
