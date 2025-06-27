@@ -10,15 +10,14 @@ WORKDIR /app
 # Copy the requirements file first to leverage Docker layer caching
 COPY requirements.txt .
 
-# Update package lists, install git-lfs, then install Python packages
+# Update package lists, install git, and then install Python packages
 # This also cleans up apt cache to reduce image size.
 RUN apt-get update && \
-    apt-get install -y git git-lfs && \
+    apt-get install -y git && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt && \
-    git lfs install
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code into the container
 COPY . .
