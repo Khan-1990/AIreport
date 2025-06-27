@@ -10,7 +10,7 @@ COPY requirements.txt .
 # Install Python libraries, huggingface_hub for downloading, and git-lfs
 RUN apt-get update && apt-get install -y git git-lfs && \
     pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r +requirements.txt && \
+    pip install --no-cache-dir -r requirements.txt && \
     git lfs install
 
 # Copy the rest of the application code into the container
