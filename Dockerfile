@@ -1,30 +1,23 @@
-# Start with a standard NVIDIA CUDA base image
-FROM nvidia/cuda:12.1.1-devel-ubuntu22.04
+# Start with a stable official NVIDIA CUDA base image that includes PyTorch
+FROM pytorch/pytorch:2.2.2-cuda12.1-cudnn8-runtime
 
-# Set environment variables to prevent interactive prompts during build
-ENV DEBIAN_FRONTEND=noninteractive
-ENV SHELL=/bin/bash
-
-# Install Python 3.11, pip, git, and aria2 for torrent downloads
-RUN apt-get update && \
-    apt-get install -y python3.11 python3-pip git git-lfs aria2 && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# Make python3.11 the default python
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1
-
-# Set the application directory
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy just the requirements file to leverage Docker's build cache
+# Copy the requirements file first to leverage Docker layer caching
 COPY requirements.txt .
 
-# Install the Python packages
-RUN pip install --no-cache-dir -r requirements.txt
+# Update package lists, install git and git-lfs for model downloading
+RUN apt-get update && apt-get install -y git git-lfs && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copy the rest of your application code
+# Install the Python packages using pip
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt && \
+    git lfs install
+
+# Copy the rest of your application code (train.py, inference.py, etc.)
 COPY . .
 
-# Set the default command to open a bash shell
+# Set the default command to open a bash shell, which will be overridden by jobs
 CMD ["/bin/bash"]
