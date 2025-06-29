@@ -1,27 +1,30 @@
-# Use a stable official NVIDIA CUDA base image with PyTorch
-FROM pytorch/pytorch:2.2.2-cuda12.1-cudnn8-runtime
+# Start with a standard NVIDIA CUDA base image
+FROM nvidia/cuda:12.1.1-devel-ubuntu22.04
 
-# Set environment variables to ensure non-interactive setup
+# Set environment variables to prevent interactive prompts during build
 ENV DEBIAN_FRONTEND=noninteractive
+ENV SHELL=/bin/bash
 
-# Set the working directory inside the container
+# Install Python 3.11, pip, and git
+RUN apt-get update && \
+    apt-get install -y python3.11 python3-pip git git-lfs && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Make python3.11 the default python
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1
+
+# Set the application directory
 WORKDIR /app
 
-# Copy the requirements file first to leverage Docker layer caching
+# Copy just the requirements file to leverage Docker's build cache
 COPY requirements.txt .
 
-# Update package lists, install git, and then install Python packages
-# This also cleans up apt cache to reduce image size.
-RUN apt-get update && \
-    apt-get install -y git && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+# Install the Python packages
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application code into the container
+# Copy the rest of your application code
 COPY . .
 
-# This command will be run by default when the container starts.
-# We will override this when running specific jobs (like training or inference).
+# Set the default command to open a bash shell
 CMD ["/bin/bash"]
