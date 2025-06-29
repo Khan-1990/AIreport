@@ -6,29 +6,15 @@ This repository contains the necessary files to fine-tune and evaluate LLMs on t
 
 1.  **Create Project & Service:** Create a project and a "Combined Service" on Northflank, linking it to this GitHub repository and selecting an NVIDIA GPU.
 2.  **Add Storage:** Attach a persistent storage volume to the service (e.g., at mount path `/data`). Upload your `training_data.jsonl` and `docxexport.json` files to this `/data` volume.
+3.  **Add Secrets:** Add a project secret named `HF_TOKEN` with your Hugging Face access token.
 
-## One-Time Model Download (Alternative Method)
+## One-Time Model Download
 
-To avoid depending on a live connection to the Hugging Face Hub during training, we will download the models once to our persistent storage using their official direct download methods.
+Run the following commands as a **one-off Job** on Northflank to download the models to your persistent storage.
 
-**For LLaMA 3:**
-
-1.  Go to the [official Meta Llama website](https://llama.meta.com/llama-downloads/) and request access to the Llama 3 8B Instruct model.
-2.  Meta will email you a temporary, signed URL to download the model.
-3.  Run a **one-off Manual Job** on Northflank with the following command, pasting the URL you received from Meta:
-
-    ```bash
-    wget -O - "PASTE_THE_SIGNED_URL_FROM_META_HERE" | tar -x -C /data/Llama-3-8B-Instruct
-    ```
-    *(Note: You must create the `/data/Llama-3-8B-Instruct` directory first if it doesn't exist)*
-
-**For Mistral-7B:**
-
-The most common distribution is via Hugging Face, but you can also download it via torrent if you wish to completely avoid the Hub. For simplicity in this trial, we recommend using the Hugging Face download method for Mistral as it is open-access and does not require a token.
-
-**Command to run as a Manual Job:**
+**Command to Download LLaMA 3:**
 ```bash
 huggingface-cli download \
-  mistralai/Mistral-7B-Instruct-v0.2 \
-  --local-dir /data/Mistral-7B-Instruct-v0.2 \
+  meta-llama/Meta-Llama-3-8B-Instruct \
+  --local-dir /data/Llama-3-8B-Instruct \
   --local-dir-use-symlinks False
