@@ -5,9 +5,9 @@ FROM nvidia/cuda:12.1.1-devel-ubuntu22.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV SHELL=/bin/bash
 
-# Install Python 3.11, pip, and git
+# Install Python 3.11, pip, git, and aria2 for torrent downloads
 RUN apt-get update && \
-    apt-get install -y python3.11 python3-pip git git-lfs && \
+    apt-get install -y python3.11 python3-pip git git-lfs aria2 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
