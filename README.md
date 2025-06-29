@@ -13,7 +13,9 @@ This repository contains the necessary files to fine-tune and evaluate LLMs on t
 Run the following commands as a **one-off Job** on Northflank to download the models to your persistent storage.
 
 **Command to Download LLaMA 3:**
-python train.py \
-  --model_path "/data/Llama-3-8B-Instruct" \
-  --data_path "/data" \
-  --output_dir "/data/llama-3-8b-story-generator"
+*Note: This still requires Hugging Face access, as Meta has gated the model.*
+```bash
+huggingface-cli download \
+  meta-llama/Meta-Llama-3-8B-Instruct \
+  --local-dir /data/Llama-3-8B-Instruct \
+  --local-dir-use-symlinks False
